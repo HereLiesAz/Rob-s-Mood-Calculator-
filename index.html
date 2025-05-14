@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Boss Mood Map - French Quarter</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      padding: 1rem;
+    }
+    h1, h3 {
+      color: #ff66b2;
+      text-align: center;
+    }
+    label, select, button {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 1rem auto;
+      font-size: 1rem;
+    }
+    select {
+      padding: 0.5rem;
+      background: #1e1e1e;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 4px;
+    }
+    button {
+      padding: 0.75rem;
+      background-color: #ff66b2;
+      color: #121212;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #ff3388;
+    }
+    #forecast, #response {
+      margin: 1rem auto;
+      max-width: 600px;
+      background-color: #1f1f1f;
+      padding: 1rem;
+      border-radius: 5px;
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Boss Mood Map - French Quarter Edition</h1>
+
+  <label for="drinking">Drinking:</label>
+  <select id="drinking">
+    <option value="none">None</option>
+    <option value="buzzed">Buzzed</option>
+    <option value="drunk">Drunk</option>
+  </select>
+
+  <label for="romanticStatus">Romantic Status:</label>
+  <select id="romanticStatus">
+    <option value="distant">Emotionally Distant</option>
+    <option value="heartbroken">Heartbroken</option>
+    <option value="inRelationship">In a Relationship</option>
+    <option value="chasing">Chasing</option>
+  </select>
+
+  <button id="calculateMood">Calculate Mood</button>
+
+  <div id="moodResult">
+    <h3>Current Mood Forecast</h3>
+    <div id="forecast"></div>
+    <div id="response"></div>
+  </div>
+
+  <script>
+    const events = [
+      { name: "Bayou Boogaloo", start: "2025-05-16", end: "2025-05-18" },
+      { name: "Greek Fest", start: "2025-05-23", end: "2025-05-25" },
+      { name: "Pride Fest", start: "2025-06-14", end: "2025-06-14" },
+      { name: "Tomato Fest", start: "2025-06-07", end: "2025-06-08" },
+      { name: "Restaurant Week", start: "2025-06-16", end: "2025-06-22" }
+    ];
+
+    function isEventToday() {
+      const today = new Date().toISOString().split('T')[0];
+      return events.some(event => today >= event.start && today <= event.end);
+    }
+
+    function getTimeOfDay() {
+      const hour = new Date().getHours();
+      if (hour >= 18 && hour < 21) return "earlyShift";
+      if (hour >= 21 && hour < 23) return "midShift";
+      if (hour >= 23 || hour < 2) return "lateShift";
+      return "offHours";
+    }
+
+    window.onload = function () {
+      document.getElementById("drinking").value = localStorage.getItem("drinking") || "none";
+      document.getElementById("romanticStatus").value = localStorage.getItem("romanticStatus") || "distant";
+    };
+
+    document.getElementById("calculateMood").addEventListener("click", function () {
+      const drinking = document.getElementById("drinking").value;
+      const romanticStatus = document.getElementById("romanticStatus").value;
+
+      localStorage.setItem("drinking", drinking);
+      localStorage.setItem("romanticStatus", romanticStatus);
+
+      const timeOfDay = getTimeOfDay();
+      const eventToday = isEventToday();
+
+      let mood = "";
+      let response = "";
+
+      if (drinking === "drunk") {
+        mood = "Unpredictable and erratic. Likely short-tempered.";
+      } else if (drinking === "buzzed") {
+        mood = "Chattier, but may become defensive.";
+      } else {
+        mood = "Stable, but emotionally distant.";
+      }
+
+      if (eventToday) {
+        mood += " Extra stress due to event pressure.";
+      }
+
+      if (timeOfDay === "earlyShift") {
+        mood += " Early shift: often irritable.";
+      } else if (timeOfDay === "midShift") {
+        mood += " Mid shift: may be overly confident or grumpy.";
+      } else if (timeOfDay === "lateShift") {
+        mood += " Late shift: unpredictable, moody.";
+      } else {
+        mood += " Off-hours: less predictable.";
+      }
+
+      if (romanticStatus === "heartbroken") {
+        response = "He’s probably withdrawn. Don’t expect deep convo.";
+      } else if (romanticStatus === "inRelationship") {
+        response = "More stable and secure—good time to talk.";
+      } else if (romanticStatus === "chasing") {
+        response = "Performative energy. Be strategic.";
+      } else {
+        response = "Keep communication brief and functional.";
+      }
+
+      document.getElementById("forecast").textContent = mood;
+      document.getElementById("response").textContent = response;
+    });
+  </script>
+</body>
+</html>
